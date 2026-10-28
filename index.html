@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Crop Recommendation System</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#f0f4f0;font-family:'Segoe UI',system-ui,sans-serif;padding:2rem 1rem}
+    .wrap{max-width:680px;margin:0 auto}
+    .hero{text-align:center;padding:1.5rem 0 1.75rem}
+    .hero-chip{display:inline-flex;align-items:center;gap:6px;background:#d6ecd6;border:1px solid #b0d4a0;border-radius:20px;padding:4px 14px;font-size:12px;color:#2d6a2d;font-weight:600;letter-spacing:.4px;margin-bottom:1rem}
+    .hero h1{font-size:26px;font-weight:700;color:#163316;letter-spacing:-.4px;margin-bottom:.4rem}
+    .hero p{font-size:13px;color:#5c7a5c}
+    .card{background:#fff;border:1px solid #d4e4d4;border-radius:18px;overflow:hidden;box-shadow:0 1px 6px rgba(30,80,30,.06)}
+    .card-top{background:#f7fbf7;border-bottom:1px solid #e0ede0;padding:1.1rem 1.75rem;display:flex;align-items:center;gap:10px}
+    .c-icon{width:36px;height:36px;border-radius:9px;background:#ddf0dd;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .c-icon i{font-size:18px;color:#2d6a2d}
+    .c-title{font-size:14px;font-weight:600;color:#163316}
+    .c-sub{font-size:11px;color:#7a9a7a;margin-top:1px}
+    .body{padding:1.5rem 1.75rem 1.75rem}
+    .sec{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#8aaa8a;display:flex;align-items:center;gap:8px;margin-bottom:1rem}
+    .sec::after{content:'';flex:1;height:1px;background:#e4ede4}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem}
+    .divider{height:1px;background:#eaf3ea;margin:1.1rem 0 1.4rem}
+    .f-wrap{display:flex;flex-direction:column;gap:4px}
+    .f-top{display:flex;align-items:center;justify-content:space-between}
+    .f-label{font-size:12px;font-weight:600;color:#3d5c3d;display:flex;align-items:center;gap:5px}
+    .chem-badge{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;font-size:10px;font-weight:700;background:#d4edcc;color:#276327;border:1px solid #b0d4a0;flex-shrink:0}
+    .lab-icon{font-size:15px;color:#2d6a2d;line-height:1}
+    .f-status{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:500;opacity:0;transition:opacity .2s;white-space:nowrap}
+    .f-status.show{opacity:1}
+    .f-status.ok{color:#2d7a2d}
+    .f-status.err{color:#c0392b}
+    .f-status.req{color:#c0392b}
+    .f-status i{font-size:13px}
+    .inp-row{position:relative}
+    .inp-row input{width:100%;background:#f7fbf7;border:1.5px solid #d4e4d4;border-radius:9px;padding:9px 36px 9px 11px;font-size:13px;color:#163316;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
+    .inp-row input::placeholder{color:#b0c8b0;font-size:12px}
+    .inp-row input:focus{border-color:#3B6D11;box-shadow:0 0 0 3px rgba(59,109,17,.1);background:#fff}
+    .inp-row input.valid{border-color:#3B6D11;background:#f3fbf0}
+    .inp-row input.invalid{border-color:#e05252;background:#fff8f8;box-shadow:0 0 0 3px rgba(224,82,82,.08)}
+    .inp-row input.required-err{border-color:#e05252;background:#fff8f8;box-shadow:0 0 0 3px rgba(224,82,82,.08)}
+    .inp-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:15px;opacity:0;transition:opacity .2s}
+    .inp-icon.ok{color:#2d7a2d;opacity:1}
+    .inp-icon.err{color:#e05252;opacity:1}
+    .range-bar{height:4px;background:#e4ede4;border-radius:4px;margin-top:5px;overflow:hidden}
+    .range-fill{height:100%;background:#3B6D11;border-radius:4px;width:0%;transition:width .3s}
+    .range-fill.warn{background:#d4a017}
+    .range-fill.danger{background:#e05252}
+    .range-hint{display:flex;justify-content:space-between;font-size:10px;color:#aabcaa;margin-top:3px}
+    .progress-bar-wrap{height:3px;background:#e4ede4;border-radius:3px;margin-bottom:1.25rem;overflow:hidden;display:none}
+    .progress-bar-wrap.show{display:block}
+    .progress-bar-fill{height:100%;background:#3B6D11;border-radius:3px;transition:width .4s ease}
+    .btn-submit{width:100%;background:#2d6a2d;color:#fff;border:none;border-radius:11px;padding:13px 20px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:background .15s,transform .1s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:.25rem}
+    .btn-submit:hover{background:#235223}
+    .btn-submit:active{transform:scale(.99)}
+    .btn-submit:disabled{background:#8aaa8a;cursor:not-allowed;transform:none}
+    .result-wrap{background:#f0fbf0;border:1px solid #a8d4a8;border-radius:14px;padding:1.5rem;margin-top:1.5rem;text-align:center;display:none}
+    .result-wrap.show{display:block}
+    .result-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#3d6e3d;margin-bottom:.4rem}
+    .result-crop{font-size:30px;font-weight:700;color:#163316;margin-bottom:1rem}
+    .btn-again{display:inline-flex;align-items:center;gap:5px;background:#fff;color:#2d6a2d;border:1px solid #a8d4a8;border-radius:8px;padding:8px 18px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;transition:background .15s}
+    .btn-again:hover{background:#e8f7e8}
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-chip"><i class="ti ti-leaf" aria-hidden="true"></i> ML-Powered</div>
+    <h1>Crop Recommendation System</h1>
+    <p>Enter your soil &amp; climate parameters to get an intelligent crop suggestion</p>
+  </div>
+
+  <div class="card">
+    <div class="card-top">
+      <div class="c-icon"><i class="ti ti-plant" aria-hidden="true"></i></div>
+      <div>
+        <div class="c-title">Field Parameter Input</div>
+        <div class="c-sub">All 7 fields required &mdash; values validated in real time</div>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="progress-bar-wrap" id="progWrap">
+        <div class="progress-bar-fill" id="progBar" style="width:0%"></div>
+      </div>
+
+      <form action="/predict" method="POST" id="cropForm" onsubmit="return handleSubmit(event)">
+
+        <div class="sec">Soil nutrients</div>
+        <div class="grid">
+
+          <!-- Nitrogen: 0–140 -->
+          <div class="f-wrap" data-field="N">
+            <div class="f-top">
+              <span class="f-label"><span class="chem-badge">N</span> Nitrogen</span>
+              <span class="f-status" id="st-N"></span>
+            </div>
+            <div class="inp-row">
+              <input type="number" id="Nitrogen" name="Nitrogen" placeholder="mg/kg  (0 – 140)" min="0" max="140" step="1" oninput="validate(this,'N',0,140)">
+              <i class="ti inp-icon" id="ic-N" aria-hidden="true"></i>
+            </div>
+            <div class="range-bar"><div class="range-fill" id="rb-N"></div></div>
+            <div class="range-hint"><span>0</span><span>140 mg/kg</span></div>
+          </div>
+
+          <!-- Phosphorus: 5–124 -->
+          <div class="f-wrap" data-field="P">
+            <div class="f-top">
+              <span class="f-label"><span class="chem-badge">P</span> Phosphorus</span>
+              <span class="f-status" id="st-P"></span>
+            </div>
+            <div class="inp-row">
+              <input type="number" id="Phosporus" name="Phosporus" placeholder="mg/kg  (5 – 124)" min="5" max="124" step="1" oninput="validate(this,'P',5,124)">
+              <i class="ti inp-icon" id="ic-P" aria-hidden="true"></i>
+            </div>
+            <div class="range-bar"><div class="range-fill" id="rb-P"></div></div>
+            <div class="range-hint"><span>5</span><span>124 mg/kg</span></div>
+          </div>
+
+          <!-- Potassium: 5–88.5 -->
+          <div class="f-wrap" data-field="K">
+            <div class="f-top">
+              <span class="f-label"><span class="chem-badge">K</span> Potassium</span>
+              <span class="f-status" id="st-K"></span>
+            </div>
+            <div class="inp-row">
+              <input type="number" id="Potassium" name="Potassium" placeholder="mg/kg  (5 – 88.5)" min="5" max="88.5" step="0.1" oninput="validate(this,'K',5,88.5)">
+              <i class="ti inp-icon" id="ic-K" aria-hidden="true"></i>
+            </div>
+            <div class="range-bar"><div class="range-fill" id="rb-K"></div></div>
+            <div class="range-hint"><span>5</span><span>88.5 mg/kg</span></div>
+          </div>
+
+          <!-- pH: 4.51–8.32 -->
+          <div class="f-wrap" data-field="pH">
+            <div class="f-top">
+              <span class="f-label"><i class="ti ti-flask lab-icon" aria-hidden="true"></i> pH value</span>
+              <span class="f-status" id="st-pH"></span>
+            </div>
+            <div class="inp-row">
+              <input type="number" step="0.01" id="Ph" name="Ph" placeholder="(4.51 – 8.32)" min="4.51" max="8.32" oninput="validate(this,'pH',4.51,8.32)">
+              <i class="ti inp-icon" id="ic-pH" aria-hidden="true"></i>
+            </div>
+            <div class="range-bar"><div class="range-fill" id="rb-pH"></div></div>
+            <div class="range-hint"><span>4.51</span><span>8.32</span></div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="sec">Climate conditions</div>
+
+        <!-- Temperature + Humidity -->
+        <div class="grid" style="margin-bottom:1rem">
+
+          <!-- Temperature: 14.48–37.16 -->
+          <div class="f-wrap" data-field="T">
+            <div class="f-top">
+              <span class="f-label"><i class="ti ti-temperature lab-icon" aria-hidden="true"></i> Temperature</span>
+              <span class="f-status" id="st-T"></span>
+            </div>
+            <div class="inp-row">
+              <input type="number" step="0.01" id="Temperature" name="Temperature" placeholder="°C  (14.48 – 37.16)" min="14.48" max="37.16" oninput="validate(this,'T',14.48,37.16)">
+              <i class="ti inp-icon" id="ic-T" aria-hidden="true"></i>
+            </div>
+            <div class="range-bar"><div class="range-fill" id="rb-T"></div></div>
+            <div class="range-hint"><span>14.48°C</span><span>37.16°C</span></div>
+          </div>
+
+          <!-- Humidity: 14.26–99.98 -->
+          <div class="f-wrap" data-field="H">
+            <div class="f-top">
+              <span class="f-label"><i class="ti ti-droplet lab-icon" aria-hidden="true"></i> Humidity</span>
+              <span class="f-status" id="st-H"></span>
+            </div>
+            <div class="inp-row">
+              <input type="number" step="0.01" id="Humidity" name="Humidity" placeholder="%  (14.26 – 99.98)" min="14.26" max="99.98" oninput="validate(this,'H',14.26,99.98)">
+              <i class="ti inp-icon" id="ic-H" aria-hidden="true"></i>
+            </div>
+            <div class="range-bar"><div class="range-fill" id="rb-H"></div></div>
+            <div class="range-hint"><span>14.26%</span><span>99.98%</span></div>
+          </div>
+        </div>
+
+        <!-- Rainfall centered: 20.36–255.26 -->
+        <div style="max-width:calc(50% - 0.5rem);margin:0 auto 1.25rem">
+          <div class="f-wrap" data-field="R">
+            <div class="f-top">
+              <span class="f-label"><i class="ti ti-cloud-rain lab-icon" aria-hidden="true"></i> Rainfall</span>
+              <span class="f-status" id="st-R"></span>
+            </div>
+            <div class="inp-row">
+              <input type="number" step="0.01" id="Rainfall" name="Rainfall" placeholder="mm  (20.36 – 255.26)" min="20.36" max="255.26" oninput="validate(this,'R',20.36,255.26)">
+              <i class="ti inp-icon" id="ic-R" aria-hidden="true"></i>
+            </div>
+            <div class="range-bar"><div class="range-fill" id="rb-R"></div></div>
+            <div class="range-hint"><span>20.36</span><span>255.26 mm</span></div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <i class="ti ti-search" aria-hidden="true"></i>
+          <span id="btnTxt">Get Recommendation</span>
+        </button>
+
+      </form>
+
+      <!-- Flask result block -->
+      {% if result %}
+      <div class="result-wrap show">
+        <div class="result-label">Recommended crop for your field</div>
+        <div class="result-crop">{{ result }}</div>
+        <a href="/" class="btn-again"><i class="ti ti-refresh" aria-hidden="true"></i> Try again</a>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+
+<script>
+const fieldValid = {N:false, P:false, K:false, pH:false, T:false, H:false, R:false};
+const fieldTouched = {N:false, P:false, K:false, pH:false, T:false, H:false, R:false};
+
+function validate(inp, key, mn, mx) {
+  fieldTouched[key] = true;
+  const v = parseFloat(inp.value);
+  const st = document.getElementById('st-' + key);
+  const ic = document.getElementById('ic-' + key);
+  const rb = document.getElementById('rb-' + key);
+
+  if (inp.value === '') {
+    inp.classList.remove('valid', 'invalid');
+    st.className = 'f-status';
+    st.innerHTML = '';
+    ic.className = 'ti inp-icon';
+    rb.style.width = '0%';
+    rb.classList.remove('warn', 'danger');
+    fieldValid[key] = false;
+    updateProgress();
+    return;
+  }
+
+  const pct = Math.min(100, Math.max(0, ((v - mn) / (mx - mn)) * 100));
+  rb.style.width = pct.toFixed(1) + '%';
+  rb.classList.remove('warn', 'danger');
+  if (pct > 90) rb.classList.add('danger');
+  else if (pct > 75) rb.classList.add('warn');
+
+  if (v >= mn && v <= mx) {
+    inp.classList.add('valid'); inp.classList.remove('invalid', 'required-err');
+    st.innerHTML = '<i class="ti ti-check"></i> Valid';
+    st.className = 'f-status show ok';
+    ic.className = 'ti ti-check inp-icon ok';
+    fieldValid[key] = true;
+  } else {
+    inp.classList.add('invalid'); inp.classList.remove('valid', 'required-err');
+    const msg = v < mn ? 'Too low' : 'Too high';
+    st.innerHTML = '<i class="ti ti-x"></i> ' + msg;
+    st.className = 'f-status show err';
+    ic.className = 'ti ti-x inp-icon err';
+    fieldValid[key] = false;
+  }
+  updateProgress();
+}
+
+function markRequired(key) {
+  const inp = document.querySelector('[data-field="' + key + '"] input');
+  const st = document.getElementById('st-' + key);
+  const ic = document.getElementById('ic-' + key);
+  inp.classList.add('required-err');
+  inp.classList.remove('valid', 'invalid');
+  st.innerHTML = '<i class="ti ti-alert-circle"></i> Required';
+  st.className = 'f-status show req';
+  ic.className = 'ti ti-alert-circle inp-icon err';
+}
+
+function updateProgress() {
+  const inputs = document.querySelectorAll('.inp-row input');
+  let filledCount = 0;
+  inputs.forEach(i => { if (i.value !== '') filledCount++; });
+  const pct = Math.round((filledCount / 7) * 100);
+  const pw = document.getElementById('progWrap');
+  const pb = document.getElementById('progBar');
+  pw.classList.toggle('show', filledCount > 0);
+  pb.style.width = pct + '%';
+  pb.style.background = pct === 100 ? '#2d6a2d' : '#3B6D11';
+}
+
+function handleSubmit(e) {
+  // Mark any empty fields as required
+  const keys = ['N','P','K','pH','T','H','R'];
+  let hasEmpty = false;
+  keys.forEach(k => {
+    const inp = document.querySelector('[data-field="' + k + '"] input');
+    if (!inp.value) {
+      markRequired(k);
+      hasEmpty = true;
+    }
+  });
+
+  const allValid = Object.values(fieldValid).every(v => v);
+
+  if (hasEmpty || !allValid) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const origBg = btn.style.background;
+    btn.style.background = '#e05252';
+    document.getElementById('btnTxt').textContent = 'Please fill all fields correctly';
+    setTimeout(() => {
+      btn.style.background = origBg;
+      document.getElementById('btnTxt').textContent = 'Get Recommendation';
+    }, 2200);
+    // Scroll to first error
+    const firstErr = document.querySelector('.inp-row input.invalid, .inp-row input.required-err');
+    if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return false;
+  }
+
+  // Valid — show loading state
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  document.getElementById('btnTxt').textContent = 'Analyzing…';
+  return true; // allow form POST
+}
+</script>
+
+</body>
+</html>
